@@ -15,7 +15,11 @@ const httpServer = createServer(app);
 
 // CORS setup
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: [
+    "http://localhost:3000",
+    "https://srisai360group.vercel.app",
+    "https://srisai360group.vercel.app/"
+  ],
   credentials: true
 }));
 
@@ -28,7 +32,11 @@ app.use('/api/tasks', taskRoutes);
 // Socket.IO setup
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: [
+      "http://localhost:3000",
+      "https://srisai360group.vercel.app",
+      "https://srisai360group.vercel.app/"
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"]
   }
 });
@@ -75,7 +83,7 @@ io.on('connection', (socket) => {
 app.set('io', io);
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/taskmanager')
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log('MongoDB connection error:', err));
 
@@ -84,5 +92,4 @@ const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Socket.IO server ready`);
-  console.log(`API available at http://localhost:${PORT}/api`);
 });
