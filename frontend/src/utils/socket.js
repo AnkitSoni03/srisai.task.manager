@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client'
 
 // Development URL
-const SOCKET_URL = 'http://localhost:5000'
+const SOCKET_URL = 'http://localhost:5000' || 'https://srisai-360-server.onrender.com'
 
 // Create socket connection with options
 export const socket = io(SOCKET_URL, {
