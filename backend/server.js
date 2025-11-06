@@ -37,7 +37,7 @@ const io = new Server(httpServer, {
 const connectedUsers = new Map();
 
 io.on('connection', (socket) => {
-  console.log('🔌 User connected:', socket.id);
+  console.log('User connected:', socket.id);
   
   // User join par usko store karo
   socket.on('user_connected', (userData) => {
@@ -47,7 +47,7 @@ io.on('connection', (socket) => {
       socketId: socket.id
     });
     
-    console.log(`👤 User ${userData.userName} connected with socket ${socket.id}`);
+    console.log(`User ${userData.userName} connected with socket ${socket.id}`);
     
     // Sabko batayo kitne users online hain
     io.emit('users_update', {
@@ -59,7 +59,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     const user = connectedUsers.get(socket.id);
     if (user) {
-      console.log(`👋 User ${user.userName} disconnected`);
+      console.log(`User ${user.userName} disconnected`);
       connectedUsers.delete(socket.id);
       
       // Update users count
@@ -76,13 +76,13 @@ app.set('io', io);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/taskmanager')
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch(err => console.log('❌ MongoDB connection error:', err));
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.log('MongoDB connection error:', err));
 
 const PORT = process.env.PORT || 5000;
 
 httpServer.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`🔗 Socket.IO server ready`);
-  console.log(`🌐 API available at http://localhost:${PORT}/api`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Socket.IO server ready`);
+  console.log(`API available at http://localhost:${PORT}/api`);
 });
