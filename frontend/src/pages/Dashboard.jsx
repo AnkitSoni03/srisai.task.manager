@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { fetchTasks, fetchAllTasks, createTask, taskCreated, taskUpdated, taskDeleted } from '../store/slices/tasksSlice'
 import { logout } from '../store/slices/authSlice'
 import { socket } from '../utils/socket'
-import { Plus, LogOut, Bell, Users, RefreshCw, Eye, EyeOff } from 'lucide-react'
+import { Plus, LogOut, Bell, Users, RefreshCw, Eye, Menu, X } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
 import TaskItem from '../components/TaskItem'
 import ThemeToggle from '../components/ThemeToggle'
@@ -20,6 +20,7 @@ const Dashboard = () => {
   })
   const [onlineUsers, setOnlineUsers] = useState(1)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -83,8 +84,7 @@ const Dashboard = () => {
           </div>,
           {
             duration: 5000,
-            position: 'top-right',
-            icon: '🎯'
+            position: 'top-right'
           }
         )
       } else {
@@ -113,8 +113,7 @@ const Dashboard = () => {
           </div>,
           {
             duration: 5000,
-            position: 'top-right',
-            icon: '✏️'
+            position: 'top-right'
           }
         )
       } else {
@@ -143,8 +142,7 @@ const Dashboard = () => {
           </div>,
           {
             duration: 5000,
-            position: 'top-right',
-            icon: '🗑️'
+            position: 'top-right'
           }
         )
       } else {
@@ -250,31 +248,38 @@ const Dashboard = () => {
       <Toaster />
       
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
+            {/* Left Section - Logo and Mobile Menu */}
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden p-2 rounded-md text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+
               <div className="flex items-center">
-                <Bell className="h-8 w-8 text-blue-500 mr-3" />
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Task Manager
+                <Bell className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500 mr-2 sm:mr-3" />
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+                  SriSaiGroup
                 </h1>
-                <span className="ml-4 text-sm text-green-600 bg-green-100 px-2 py-1 rounded-full flex items-center">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                  Real-time
-                </span>
               </div>
               
-              {/* Online Users */}
-              <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+              {/* Online Users - Hidden on mobile */}
+              <div className="hidden sm:flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
                 <Users size={16} />
                 <span>{onlineUsers} online</span>
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-700 dark:text-gray-300 hidden sm:block">
-                Welcome, <strong>{userInfo?.name}</strong>!
+            {/* Right Section - User Info and Actions */}
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              {/* Welcome Text - Hidden on small mobile */}
+              <span className="hidden xs:block text-gray-700 dark:text-gray-300 text-sm sm:text-base">
+                Welcome, <strong className="truncate max-w-[80px] sm:max-w-none">{userInfo?.name}</strong>!
               </span>
               
               {/* Refresh Button */}
@@ -291,91 +296,108 @@ const Dashboard = () => {
               
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
               >
                 <LogOut size={16} />
                 <span className="hidden sm:block">Logout</span>
               </button>
             </div>
           </div>
+
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className="lg:hidden border-t border-gray-200 dark:border-gray-700 py-4">
+              <div className="flex flex-col space-y-3">
+                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                  <Users size={16} />
+                  <span>{onlineUsers} users online</span>
+                </div>
+                <div className="text-sm text-gray-700 dark:text-gray-300">
+                  Welcome, <strong>{userInfo?.name}</strong>!
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Total Tasks</div>
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
+        {/* Stats Cards - Responsive Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-3 lg:gap-4 mb-6 sm:mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow border border-gray-200 dark:border-gray-700">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</div>
+            <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Total Tasks</div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl font-bold text-orange-500">{stats.todo}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">To Do</div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow border border-gray-200 dark:border-gray-700">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-orange-500">{stats.todo}</div>
+            <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">To Do</div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl font-bold text-blue-500">{stats.inProgress}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">In Progress</div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow border border-gray-200 dark:border-gray-700">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-500">{stats.inProgress}</div>
+            <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">In Progress</div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl font-bold text-green-500">{stats.done}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Completed</div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow border border-gray-200 dark:border-gray-700">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-green-500">{stats.done}</div>
+            <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Completed</div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow border border-blue-200 dark:border-blue-700">
-            <div className="text-2xl font-bold text-blue-600">{stats.myTotal}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">My Tasks</div>
+          <div className="col-span-2 lg:col-span-1 bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow border border-blue-200 dark:border-blue-700">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-600">{stats.myTotal}</div>
+            <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">My Tasks</div>
           </div>
         </div>
 
         {/* View Toggle and Add Task Button */}
-        <div className="mb-8 flex justify-between items-center">
-          <div className="flex gap-4">
+        <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex gap-2 sm:gap-4 w-full sm:w-auto">
             <button
               onClick={() => setViewMode('all')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base flex-1 sm:flex-none justify-center ${
                 viewMode === 'all' 
                   ? 'bg-blue-600 text-white' 
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
               }`}
             >
-              <Eye size={18} />
-              All Tasks
+              <Eye size={16} />
+              <span className="hidden xs:inline">All Tasks</span>
+              <span className="xs:hidden">All</span>
             </button>
             <button
               onClick={() => setViewMode('my')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base flex-1 sm:flex-none justify-center ${
                 viewMode === 'my' 
                   ? 'bg-green-600 text-white' 
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
               }`}
             >
-              <Eye size={18} />
-              My Tasks
+              <Eye size={16} />
+              <span className="hidden xs:inline">My Tasks</span>
+              <span className="xs:hidden">My</span>
             </button>
           </div>
           
           <button
             onClick={() => setShowTaskForm(!showTaskForm)}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+            className="flex items-center gap-1 sm:gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md text-sm sm:text-base w-full sm:w-auto justify-center"
           >
-            <Plus size={20} />
-            Add New Task
+            <Plus size={18} />
+            <span>Add New Task</span>
           </button>
         </div>
 
         {/* View Mode Info */}
         <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
-          <div className="flex items-center gap-2 text-blue-800 dark:text-blue-300">
+          <div className="flex items-center gap-2 text-blue-800 dark:text-blue-300 text-sm">
             {viewMode === 'all' ? (
               <>
-                <Eye size={16} />
+                <Eye size={14} />
                 <span className="font-medium">Viewing All Tasks</span>
-                <span className="text-sm">- You can see tasks from all users</span>
+                <span className="hidden sm:inline text-xs">- You can see tasks from all users</span>
               </>
             ) : (
               <>
-                <EyeOff size={16} />
+                <Eye size={14} />
                 <span className="font-medium">Viewing My Tasks</span>
-                <span className="text-sm">- Only your tasks are visible</span>
+                <span className="hidden sm:inline text-xs">- Only your tasks are visible</span>
               </>
             )}
           </div>
@@ -383,7 +405,7 @@ const Dashboard = () => {
 
         {/* Task Form */}
         {showTaskForm && (
-          <div className="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
+          <div className="mb-6 sm:mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
               Create New Task
             </h3>
@@ -397,7 +419,7 @@ const Dashboard = () => {
                   required
                   value={newTask.title}
                   onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm sm:text-base"
                   placeholder="What needs to be done?"
                   maxLength={100}
                 />
@@ -413,7 +435,7 @@ const Dashboard = () => {
                 <textarea
                   value={newTask.description}
                   onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm sm:text-base"
                   placeholder="Add more details about this task..."
                   rows="3"
                   maxLength={500}
@@ -423,7 +445,7 @@ const Dashboard = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Status
@@ -431,7 +453,7 @@ const Dashboard = () => {
                   <select
                     value={newTask.status}
                     onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm sm:text-base"
                   >
                     <option value="todo">📝 To Do</option>
                     <option value="in-progress">🔄 In Progress</option>
@@ -447,16 +469,16 @@ const Dashboard = () => {
                     type="date"
                     value={newTask.dueDate}
                     onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm sm:text-base"
                     min={new Date().toISOString().split('T')[0]}
                   />
                 </div>
               </div>
               
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-2 sm:gap-3 pt-2 flex-col sm:flex-row">
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
+                  className="px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base flex-1"
                 >
                   Create Task
                 </button>
@@ -471,7 +493,7 @@ const Dashboard = () => {
                       dueDate: ''
                     })
                   }}
-                  className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors font-medium"
+                  className="px-4 sm:px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors font-medium text-sm sm:text-base flex-1"
                 >
                   Cancel
                 </button>
@@ -482,19 +504,19 @@ const Dashboard = () => {
 
         {/* Tasks Board */}
         {getDisplayTasks().length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* To Do Column */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white flex items-center">
-                <div className="w-3 h-3 bg-gray-500 rounded-full mr-2"></div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white flex items-center">
+                <div className="w-2 h-2 sm:w-3 sm:h-3 bg-gray-500 rounded-full mr-2"></div>
                 To Do ({stats.todo})
               </h3>
-              <div className="space-y-4 min-h-[200px]">
+              <div className="space-y-3 sm:space-y-4 min-h-[150px] sm:min-h-[200px]">
                 {getTasksByStatus('todo').map(task => (
                   <TaskItem key={task._id} task={task} />
                 ))}
                 {stats.todo === 0 && (
-                  <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                  <p className="text-gray-500 dark:text-gray-400 text-center py-6 sm:py-8 text-sm sm:text-base">
                     No tasks to do
                   </p>
                 )}
@@ -502,17 +524,17 @@ const Dashboard = () => {
             </div>
 
             {/* In Progress Column */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white flex items-center">
-                <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white flex items-center">
+                <div className="w-2 h-2 sm:w-3 sm:h-3 bg-blue-500 rounded-full mr-2"></div>
                 In Progress ({stats.inProgress})
               </h3>
-              <div className="space-y-4 min-h-[200px]">
+              <div className="space-y-3 sm:space-y-4 min-h-[150px] sm:min-h-[200px]">
                 {getTasksByStatus('in-progress').map(task => (
                   <TaskItem key={task._id} task={task} />
                 ))}
                 {stats.inProgress === 0 && (
-                  <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                  <p className="text-gray-500 dark:text-gray-400 text-center py-6 sm:py-8 text-sm sm:text-base">
                     No tasks in progress
                   </p>
                 )}
@@ -520,17 +542,17 @@ const Dashboard = () => {
             </div>
 
             {/* Done Column */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white flex items-center">
-                <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white flex items-center">
+                <div className="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full mr-2"></div>
                 Done ({stats.done})
               </h3>
-              <div className="space-y-4 min-h-[200px]">
+              <div className="space-y-3 sm:space-y-4 min-h-[150px] sm:min-h-[200px]">
                 {getTasksByStatus('done').map(task => (
                   <TaskItem key={task._id} task={task} />
                 ))}
                 {stats.done === 0 && (
-                  <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                  <p className="text-gray-500 dark:text-gray-400 text-center py-6 sm:py-8 text-sm sm:text-base">
                     No completed tasks
                   </p>
                 )}
@@ -539,19 +561,20 @@ const Dashboard = () => {
           </div>
         ) : (
           /* Empty State */
-          <div className="text-center py-16">
+          <div className="text-center py-12 sm:py-16">
             <div className="text-gray-400 dark:text-gray-500 mb-4">
-              <Bell size={64} className="mx-auto opacity-50" />
+              <Bell size={48} className="sm:hidden mx-auto opacity-50" />
+              <Bell size={64} className="hidden sm:block mx-auto opacity-50" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">
               No tasks yet
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm sm:text-base">
               Get started by creating your first task!
             </p>
             <button
               onClick={() => setShowTaskForm(true)}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base"
             >
               Create Your First Task
             </button>
