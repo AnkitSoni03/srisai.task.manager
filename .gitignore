@@ -1,0 +1,28 @@
+# Bash script to create perfect MERN .gitignore
+cat > .gitignore << 'EOF'
+# MERN Stack Gitignore
+
+# Backend
+backend/node_modules/
+backend/.env
+backend/logs/
+backend/coverage/
+backend/dist/
+
+# Frontend
+frontend/node_modules/
+frontend/build/
+frontend/.env
+frontend/.next/
+frontend/.cache/
+
+# Common
+node_modules/
+.env
+.DS_Store
+.vscode/
+.idea/
+*.log
+uploads/
+temp/
+EOF
